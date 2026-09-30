@@ -1,6 +1,6 @@
 # frontend
 
-Dashboard de favoritos: login contra **auth-svc** ([`auth`](https://github.com/JesusMaVe/auth)), listado y alta de items contra la **API** ([`api`](https://github.com/JesusMaVe/api)). El JWT se inyecta como `Authorization: Bearer` en cada request.
+Dashboard de favoritos: login contra **auth-svc** ([`auth`](https://github.com/JesusMaVe/auth)), listado, alta, edición y borrado de items contra la **API** ([`api`](https://github.com/JesusMaVe/api)). El JWT se inyecta como `Authorization: Bearer` en cada request.
 
 Diseño: [spec en el repo auth](https://github.com/JesusMaVe/auth/blob/main/docs/superpowers/specs/2026-09-24-auth-dashboard-design.md)
 
@@ -31,7 +31,8 @@ make dev                  # http://127.0.0.1:5173
 3. **Console:** cada request a `/api` imprime `[api] GET /api/items Bearer eyJ…` (con `VITE_LOG_JWT=true`).
 4. **Network:** cada request a `/api/items` lleva el header `Authorization: Bearer eyJ…`.
 5. Agrega un elemento en "Agregar" → al guardar vuelve al dashboard y aparece en el listado.
-6. Cierra sesión → el token se borra y el dashboard vuelve a pedir login.
+6. En tus propios elementos, "Editar" abre el formulario lleno y "Eliminar" pide confirmación (solo el dueño puede hacerlo: la API responde 403 a los demás).
+7. Cierra sesión → el token se borra y el dashboard vuelve a pedir login.
 
 ## Imagen web (nginx)
 

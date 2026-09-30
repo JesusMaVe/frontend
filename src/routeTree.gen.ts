@@ -14,6 +14,7 @@ import { Route as AuthedRouteImport } from './routes/_authed'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthedDashboardRouteImport } from './routes/_authed/dashboard'
 import { Route as AuthedItemsNewRouteImport } from './routes/_authed/items/new'
+import { Route as AuthedItemsIdEditRouteImport } from './routes/_authed/items/$id/edit'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -39,18 +40,25 @@ const AuthedItemsNewRoute = AuthedItemsNewRouteImport.update({
   path: '/items/new',
   getParentRoute: () => AuthedRoute,
 } as any)
+const AuthedItemsIdEditRoute = AuthedItemsIdEditRouteImport.update({
+  id: '/items/$id/edit',
+  path: '/items/$id/edit',
+  getParentRoute: () => AuthedRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/dashboard': typeof AuthedDashboardRoute
   '/items/new': typeof AuthedItemsNewRoute
+  '/items/$id/edit': typeof AuthedItemsIdEditRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/dashboard': typeof AuthedDashboardRoute
   '/items/new': typeof AuthedItemsNewRoute
+  '/items/$id/edit': typeof AuthedItemsIdEditRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -59,12 +67,13 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/_authed/dashboard': typeof AuthedDashboardRoute
   '/_authed/items/new': typeof AuthedItemsNewRoute
+  '/_authed/items/$id/edit': typeof AuthedItemsIdEditRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/dashboard' | '/items/new'
+  fullPaths: '/' | '/login' | '/dashboard' | '/items/new' | '/items/$id/edit'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/dashboard' | '/items/new'
+  to: '/' | '/login' | '/dashboard' | '/items/new' | '/items/$id/edit'
   id:
     | '__root__'
     | '/'
@@ -72,6 +81,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/_authed/dashboard'
     | '/_authed/items/new'
+    | '/_authed/items/$id/edit'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -117,17 +127,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedItemsNewRouteImport
       parentRoute: typeof AuthedRoute
     }
+    '/_authed/items/$id/edit': {
+      id: '/_authed/items/$id/edit'
+      path: '/items/$id/edit'
+      fullPath: '/items/$id/edit'
+      preLoaderRoute: typeof AuthedItemsIdEditRouteImport
+      parentRoute: typeof AuthedRoute
+    }
   }
 }
 
 interface AuthedRouteChildren {
   AuthedDashboardRoute: typeof AuthedDashboardRoute
   AuthedItemsNewRoute: typeof AuthedItemsNewRoute
+  AuthedItemsIdEditRoute: typeof AuthedItemsIdEditRoute
 }
 
 const AuthedRouteChildren: AuthedRouteChildren = {
   AuthedDashboardRoute: AuthedDashboardRoute,
   AuthedItemsNewRoute: AuthedItemsNewRoute,
+  AuthedItemsIdEditRoute: AuthedItemsIdEditRoute,
 }
 
 const AuthedRouteWithChildren =

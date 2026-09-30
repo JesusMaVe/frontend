@@ -12,3 +12,11 @@ export const itemsQueryOptions = queryOptions({
 export function createItem(input: ItemInput): Promise<Item> {
   return api<Item>('/api/items', { method: 'POST', body: input })
 }
+
+export function updateItem(id: number, input: ItemInput): Promise<Item> {
+  return api<Item>(`/api/items/${id}`, { method: 'PUT', body: input })
+}
+
+export async function deleteItem(id: number): Promise<void> {
+  await api<null>(`/api/items/${id}`, { method: 'DELETE' })
+}

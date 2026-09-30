@@ -15,7 +15,7 @@ export const limits = {
 export type FieldErrors = Partial<Record<keyof ItemInput, string>>
 
 // Cuenta puntos de código, igual que utf8.RuneCountInString en la API (un emoji = 1).
-const chars = (s: string): number => [...s].length
+export const chars = (s: string): number => [...s].length
 
 export function validateItem({ title, description }: ItemInput): FieldErrors {
   const errors: FieldErrors = {}

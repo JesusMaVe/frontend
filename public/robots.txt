@@ -1,0 +1,5 @@
+# Solo el login es público; el resto requiere sesión.
+User-agent: *
+Allow: /login
+Disallow: /dashboard
+Disallow: /items/

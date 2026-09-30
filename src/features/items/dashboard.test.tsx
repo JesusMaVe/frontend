@@ -48,3 +48,28 @@ test('si la API rechaza el token (401) vuelve a /login y lo borra', async () => 
   expect(getToken()).toBeNull()
   expect(router.state.location.search).toEqual({ redirect: '/dashboard' })
 })
+
+const mario = { id: 2, title: 'Mario', description: 'Odyssey', created_by: 'bob', created_at: '2026-09-29T10:00:00Z' }
+
+test('el buscador filtra por título o descripción y guarda el texto en la URL (?q=)', async () => {
+  setToken(fakeJwt())
+  server.use(http.get('/api/items', () => HttpResponse.json({ items: [zelda, mario] })))
+  const { router, user } = renderApp('/dashboard')
+  expect(await screen.findByText('Zelda')).toBeInTheDocument()
+  expect(screen.getByText('2 elementos')).toBeInTheDocument()
+
+  await user.type(screen.getByRole('searchbox', { name: 'Buscar' }), 'odys')
+  await waitFor(() => expect(router.state.location.search).toEqual({ q: 'odys' }))
+  expect(screen.queryByText('Zelda')).not.toBeInTheDocument()
+  expect(screen.getByText('Mario')).toBeInTheDocument()
+  expect(screen.getByText('1 de 2 elementos')).toBeInTheDocument()
+})
+
+test('abrir /dashboard?q= aplica el filtro y avisa si nada coincide', async () => {
+  setToken(fakeJwt())
+  server.use(http.get('/api/items', () => HttpResponse.json({ items: [zelda, mario] })))
+  renderApp('/dashboard?q=metroid')
+  expect(await screen.findByText('Nada coincide con «metroid».')).toBeInTheDocument()
+  expect(screen.getByRole('searchbox', { name: 'Buscar' })).toHaveValue('metroid')
+  expect(screen.queryByText('Zelda')).not.toBeInTheDocument()
+})
