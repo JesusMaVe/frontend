@@ -1,8 +1,15 @@
 import { screen, waitFor } from '@testing-library/react'
-import { expect, test } from 'vitest'
+import { http, HttpResponse } from 'msw'
+import { beforeEach, expect, test } from 'vitest'
 import { fakeJwt } from '../../test/jwt'
 import { renderApp } from '../../test/render'
+import { server } from '../../test/server'
 import { getToken, setToken } from './token'
+
+// El dashboard pide /api/items al abrirse con sesión; MSW falla ante requests no manejados.
+beforeEach(() => {
+  server.use(http.get('/api/items', () => HttpResponse.json({ items: [] })))
+})
 
 test('sin token, una ruta protegida manda a /login con redirect a donde quería ir', async () => {
   const { router } = renderApp('/dashboard')
