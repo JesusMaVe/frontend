@@ -1,12 +1,10 @@
 node_modules/
 dist/
 coverage/
-.tanstack/
 .env
-*.local
-*.log
-.DS_Store
-.idea/
-.vscode/
+.git/
+.superpowers/
+docs/
+test/
 test-results/
 playwright-report/

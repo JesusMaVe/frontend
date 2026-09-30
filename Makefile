@@ -2,9 +2,17 @@ SHELL := /bin/bash
 .DEFAULT_GOAL := help
 
 # Versiones fijadas de las herramientas (único lugar; el CI usa estos mismos targets).
-GITLEAKS_IMAGE := zricethezav/gitleaks:v8.30.1
+GITLEAKS_IMAGE   := zricethezav/gitleaks:v8.30.1
+HADOLINT_IMAGE   := hadolint/hadolint:v2.15.1
+SHELLCHECK_IMAGE := koalaman/shellcheck:v0.11.0
 
-.PHONY: help env install dev test lint build audit secrets-scan
+COMPOSE  := docker compose
+export COMPOSE
+# Repo auth hermano (los tests de la imagen piden un token con su usuario semilla).
+AUTH_DIR ?= ../auth
+export AUTH_DIR
+
+.PHONY: help env install dev test lint build audit secrets-scan network up down logs test-web lint-docker
 
 help: ## Muestra esta ayuda
 	@grep -E '^[a-zA-Z_-]+:.*## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*## "} {printf "  \033[36m%-14s\033[0m %s\n", $$1, $$2}'
@@ -22,8 +30,28 @@ dev: ## Vite en 127.0.0.1 con proxy /auth → auth-svc y /api → api (requiere 
 test: ## Tests (Vitest + Testing Library + MSW)
 	npm test
 
-lint: ## oxlint + chequeo de tipos
+lint: ## oxlint + chequeo de tipos + shellcheck + hadolint
 	npm run lint
+	$(MAKE) lint-docker
+
+lint-docker: ## shellcheck + hadolint
+	docker run --rm -v "$(CURDIR):/mnt" -w /mnt $(SHELLCHECK_IMAGE) -x test/*.sh scripts/*.sh
+	docker run --rm -v "$(CURDIR):/mnt" -w /mnt $(HADOLINT_IMAGE) hadolint Dockerfile
+
+network: ## Crea la red Docker compartida con auth y api (si no existe)
+	@set -a && . "$(abspath .env)" && set +a && scripts/ensure-network.sh "$$SHARED_NETWORK" "$$SHARED_NETWORK_SUBNET"
+
+up: network ## Construye y levanta la imagen web (nginx) en 127.0.0.1:WEB_HOST_PORT
+	$(COMPOSE) up -d --build --wait
+
+down: ## Detiene la imagen web
+	$(COMPOSE) down
+
+logs: ## Logs de la imagen web
+	$(COMPOSE) logs --no-color
+
+test-web: up ## Tests de la imagen web (los de proxy necesitan auth y api levantados)
+	@test/web.sh
 
 build: ## Build de producción en dist/
 	npm run build
