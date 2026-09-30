@@ -1,5 +1,6 @@
 import { createFileRoute, Outlet, redirect, useNavigate } from '@tanstack/react-router'
 import { clearToken, currentUser } from '../features/auth/token'
+import { AppHeader } from '../features/layout/AppHeader'
 
 export const Route = createFileRoute('/_authed')({
   beforeLoad: ({ location }) => {
@@ -24,13 +25,10 @@ function AuthedLayout() {
   }
   return (
     <>
-      <div className="actions">
-        <span className="meta">{user.name ?? user.sub}</span>
-        <button type="button" className="secondary" onClick={logout}>
-          Cerrar sesión
-        </button>
-      </div>
-      <Outlet />
+      <AppHeader user={user} onLogout={logout} />
+      <main id="contenido" className="shell">
+        <Outlet />
+      </main>
     </>
   )
 }

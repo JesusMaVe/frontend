@@ -3,9 +3,21 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Valores iniciales (antes de que cargue el JS y para crawlers sin JS); cada ruta los
+         reemplaza con su `head` vía <HeadContent />. -->
     <title>Mis favoritos</title>
+    <meta name="description" content="Guarda y encuentra tus favoritos en un solo lugar." />
+    <meta name="theme-color" content="#ecede6" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#121a15" media="(prefers-color-scheme: dark)" />
+    <meta name="color-scheme" content="light dark" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Mis favoritos" />
+    <meta property="og:locale" content="es_MX" />
+    <meta name="twitter:card" content="summary" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   </head>
   <body>
+    <noscript>Mis favoritos necesita JavaScript para funcionar.</noscript>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

@@ -18,7 +18,7 @@ export function setUnauthorizedHandler(fn: () => void): void {
   onUnauthorized = fn
 }
 
-type Options = { method?: 'GET' | 'POST'; body?: unknown }
+type Options = { method?: 'GET' | 'POST' | 'PUT' | 'DELETE'; body?: unknown }
 
 // api es el ÚNICO punto de salida hacia auth-svc y la API. Si hay token lo inyecta como
 // Authorization: Bearer en cada request y, con VITE_LOG_JWT=true, lo muestra en consola.

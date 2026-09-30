@@ -108,3 +108,26 @@ test('Cancelar vuelve al dashboard', async () => {
   await user.click(await screen.findByRole('link', { name: 'Cancelar' }))
   await waitFor(() => expect(router.state.location.pathname).toBe('/dashboard'))
 })
+
+test('muestra cuántos caracteres quedan en cada campo', async () => {
+  setToken(fakeJwt())
+  fakeItemsApi()
+  const { user } = renderApp('/items/new')
+  await user.type(await screen.findByLabelText('Título'), 'Zelda 🗡️')
+  // Límites de test: título 20, descripción 50 (vite.config.ts). Cuenta puntos de código como la API.
+  expect(screen.getByText('12 restantes')).toBeInTheDocument()
+  expect(screen.getByText('50 restantes')).toBeInTheDocument()
+})
+
+test('la vista previa muestra la ficha tal como quedará en el muro', async () => {
+  setToken(fakeJwt())
+  fakeItemsApi()
+  const { user } = renderApp('/items/new')
+  const preview = await screen.findByRole('figure', { name: 'Vista previa' })
+  expect(preview).toHaveTextContent('Tu nuevo favorito')
+  await user.type(screen.getByLabelText('Título'), 'zelda')
+  await user.type(screen.getByLabelText('Descripción'), 'Breath of the Wild')
+  expect(preview).toHaveTextContent('Z')
+  expect(preview).toHaveTextContent('zelda')
+  expect(preview).toHaveTextContent('Breath of the Wild')
+})
