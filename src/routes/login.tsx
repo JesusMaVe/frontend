@@ -1,4 +1,5 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
+import { LoginPage } from '../features/auth/LoginPage'
 import { currentUser } from '../features/auth/token'
 
 export const Route = createFileRoute('/login')({
@@ -8,5 +9,10 @@ export const Route = createFileRoute('/login')({
   beforeLoad: () => {
     if (currentUser()) throw redirect({ to: '/dashboard' })
   },
-  component: () => <h2>Iniciar sesión</h2>,
+  component: LoginRoute,
 })
+
+function LoginRoute() {
+  const { redirect } = Route.useSearch()
+  return <LoginPage redirect={redirect} />
+}
