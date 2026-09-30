@@ -11,8 +11,9 @@ export COMPOSE
 # Repo auth hermano (los tests de la imagen piden un token con su usuario semilla).
 AUTH_DIR ?= ../auth
 export AUTH_DIR
+API_DIR  ?= ../api
 
-.PHONY: help env install dev test lint build audit secrets-scan network up down logs test-web lint-docker
+.PHONY: help env install dev test lint build audit secrets-scan network up down logs test-web lint-docker stack e2e e2e-browsers
 
 help: ## Muestra esta ayuda
 	@grep -E '^[a-zA-Z_-]+:.*## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*## "} {printf "  \033[36m%-14s\033[0m %s\n", $$1, $$2}'
@@ -61,3 +62,16 @@ audit: ## npm audit de las dependencias de producción (severidad alta o mayor)
 
 secrets-scan: ## Busca secretos en el historial de git (gitleaks)
 	docker run --rm -v "$(CURDIR):/repo" $(GITLEAKS_IMAGE) git --no-banner --redact /repo
+
+e2e-browsers: ## Instala Chromium para Playwright (con dependencias del sistema en CI)
+	npx playwright install $(if $(CI),--with-deps) chromium
+
+stack: ## Levanta auth, api y la imagen web, en ese orden (repos hermanos)
+	$(MAKE) -C $(AUTH_DIR) up
+	$(MAKE) -C $(API_DIR) up
+	$(MAKE) up
+
+e2e: ## Playwright contra la imagen web con los 3 repos levantados (make stack)
+	@set -a && . "$(abspath .env)" && set +a && \
+	E2E_BASE_URL="http://127.0.0.1:$$WEB_HOST_PORT" E2E_USER=alice E2E_EXPECT_LOG="$$WEB_LOG_JWT" \
+	E2E_PASSWORD="$$(sed -n 's/^LDAP_SEED_USER_PASSWORD=//p' $(AUTH_DIR)/.env)" npx playwright test

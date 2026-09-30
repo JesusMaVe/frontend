@@ -44,10 +44,41 @@ jobs:
           fetch-depth: 0
       - run: make secrets-scan
 
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          path: frontend
+      # Versiones fijadas de los otros dos repos (actualizar a propósito).
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: JesusMaVe/auth
+          ref: 77acdd23e1650df1c6a8b6c57afc82d2ac93aae2
+          path: auth
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: JesusMaVe/api
+          ref: 472c730ccc77f20622f34df9512b61444c08a358
+          path: api
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: frontend/.nvmrc
+      - run: make -C auth env
+      - run: make -C api env
+      - run: make -C frontend env
+      - run: make -C frontend install
+      - run: make -C frontend e2e-browsers
+      - run: make -C frontend stack
+      - run: make -C frontend test-web
+      - run: make -C frontend e2e
+      - if: failure()
+        run: make -C auth logs; make -C api logs; make -C frontend logs
+
   # Único check requerido por la protección de main. Al agregar un job, súmalo a `needs`.
   ci:
     if: always()
-    needs: [lint, test, secrets]
+    needs: [lint, test, secrets, e2e]
     runs-on: ubuntu-latest
     steps:
       - name: Todos los jobs pasaron

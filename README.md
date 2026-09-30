@@ -41,3 +41,13 @@ make test-web  # tests de la imagen: estáticos, CSP, fallback SPA y proxy a aut
 ```
 
 nginx sirve el build y hace proxy de `/auth` → auth-svc y `/api` → api por la red Docker compartida `practica`, con IP fija (`WEB_PROXY_IP`) para que auth-svc confíe en su `X-Forwarded-For`. `WEB_LOG_JWT=false` en producción; ponlo en `true` (y `make up`) si grabas la demo sobre la imagen.
+
+## E2E
+
+```bash
+make e2e-browsers   # una vez: Chromium para Playwright
+make stack          # levanta auth, api y la imagen web (repos hermanos ../auth y ../api)
+make e2e            # login → dashboard → agregar → listado → logout, verificando el Bearer en cada request a /api
+```
+
+Con `WEB_LOG_JWT=true` en `.env` (y `make up`), el E2E además verifica un `console.log` con el JWT por cada request. El CI corre lo mismo con `auth` y `api` en commits fijados (`.github/workflows/ci.yml`).
