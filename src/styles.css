@@ -1,0 +1,21 @@
+:root {
+  font-family: system-ui, sans-serif;
+  color: #1f2328;
+  background: #f6f8fa;
+}
+body { margin: 0; }
+.shell { max-width: 720px; margin: 0 auto; padding: 1.5rem; }
+.topbar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.topbar h1 { font-size: 1.5rem; margin: 0; }
+.card { background: #fff; border: 1px solid #d0d7de; border-radius: 8px; padding: 1.25rem; margin-top: 1rem; }
+form { display: grid; gap: 0.75rem; }
+label { display: grid; gap: 0.25rem; font-weight: 600; }
+input, textarea { font: inherit; padding: 0.5rem; border: 1px solid #d0d7de; border-radius: 6px; }
+button, .button { font: inherit; padding: 0.5rem 1rem; border-radius: 6px; border: 1px solid #1f6feb; background: #1f6feb; color: #fff; cursor: pointer; text-decoration: none; }
+button:disabled { opacity: 0.6; cursor: wait; }
+.secondary { background: #fff; color: #1f6feb; }
+.error { color: #cf222e; margin: 0; }
+.items { list-style: none; padding: 0; display: grid; gap: 0.75rem; }
+.items li { background: #fff; border: 1px solid #d0d7de; border-radius: 8px; padding: 0.75rem 1rem; }
+.meta { color: #59636e; font-size: 0.875rem; }
+.actions { display: flex; gap: 0.5rem; align-items: center; }
