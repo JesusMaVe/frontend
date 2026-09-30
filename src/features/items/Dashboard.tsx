@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
+import { Link } from '@tanstack/react-router'
 import { itemsQueryOptions } from './api'
 
 const dateFormat = new Intl.DateTimeFormat('es-MX', { dateStyle: 'medium', timeStyle: 'short' })
@@ -8,6 +9,11 @@ export function Dashboard() {
   return (
     <main className="card">
       <h2>Tus elementos</h2>
+      <p>
+        <Link to="/items/new" className="button">
+          Agregar
+        </Link>
+      </p>
       {items.isPending && <p>Cargando…</p>}
       {items.isError && (
         <p role="alert" className="error">

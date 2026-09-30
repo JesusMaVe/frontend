@@ -4,7 +4,7 @@ import { expect, test } from 'vitest'
 import { fakeJwt } from '../../test/jwt'
 import { renderApp } from '../../test/render'
 import { server } from '../../test/server'
-import { getToken } from './token'
+import { getToken, setToken } from './token'
 
 async function fillAndSubmit(user: ReturnType<typeof renderApp>['user']) {
   await user.type(await screen.findByLabelText('Usuario'), 'alice')
@@ -72,4 +72,20 @@ test('el botón se deshabilita mientras envía (sin doble envío)', async () => 
   expect(screen.getByRole('button', { name: 'Entrando…' })).toBeDisabled()
   await waitFor(() => expect(getToken()).not.toBeNull())
   expect(calls).toBe(1)
+})
+
+test('con un token vencido guardado, el login no lo manda y un 401 se queda en /login con el mensaje', async () => {
+  setToken(fakeJwt({ exp: Math.floor(Date.now() / 1000) - 60 }))
+  let authorization: string | null = 'sin llamar'
+  server.use(
+    http.post('/auth/token', ({ request }) => {
+      authorization = request.headers.get('Authorization')
+      return HttpResponse.json({ error: 'invalid credentials' }, { status: 401 })
+    }),
+  )
+  const { router, user } = renderApp('/login')
+  await fillAndSubmit(user)
+  expect(await screen.findByRole('alert')).toHaveTextContent('Usuario o contraseña incorrectos')
+  expect(authorization).toBeNull()
+  expect(router.state.location.href).toBe('/login')
 })
