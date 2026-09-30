@@ -13,8 +13,9 @@ export function NewItemPage() {
   const create = useMutation({
     mutationFn: createItem,
     onSuccess: async () => {
-      // El listado se vuelve a pedir: el item nuevo aparece al volver al dashboard.
-      await queryClient.invalidateQueries({ queryKey: itemsQueryOptions.queryKey })
+      // refetchType 'all': el listado (inactivo en esta página) se vuelve a pedir y se ESPERA antes de
+      // navegar, así el dashboard nunca pinta la lista vieja de la caché.
+      await queryClient.invalidateQueries({ queryKey: itemsQueryOptions.queryKey, refetchType: 'all' })
       await navigate({ to: '/dashboard' })
     },
     onError: (err) => {

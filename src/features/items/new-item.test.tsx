@@ -12,8 +12,9 @@ function fakeItemsApi() {
   const items: Item[] = []
   const authorization: (string | null)[] = []
   server.use(
-    http.get('/api/items', ({ request }) => {
+    http.get('/api/items', async ({ request }) => {
       authorization.push(request.headers.get('Authorization'))
+      await delay(50) // latencia realista: deja ver si se pinta la caché vieja mientras llega la respuesta
       return HttpResponse.json({ items: [...items].reverse() })
     }),
     http.post('/api/items', async ({ request }) => {
@@ -41,6 +42,8 @@ test('agregar un elemento: el nuevo aparece en el dashboard y todas las requests
   await user.click(screen.getByRole('button', { name: 'Guardar' }))
 
   await waitFor(() => expect(router.state.location.pathname).toBe('/dashboard'))
+  // Al volver, el listado ya trae el nuevo: nunca se muestra la lista vieja (vacía) de la caché.
+  expect(screen.queryByText('Todavía no agregaste nada.')).not.toBeInTheDocument()
   expect(await screen.findByText('Zelda')).toBeInTheDocument()
   expect(api.items).toEqual([expect.objectContaining({ title: 'Zelda', description: 'Breath of the Wild' })])
   expect(api.authorization.length).toBeGreaterThanOrEqual(3) // GET, POST, GET
