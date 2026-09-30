@@ -1,4 +1,4 @@
-import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
+import { createFileRoute, Outlet, redirect, useNavigate } from '@tanstack/react-router'
 import { clearToken, currentUser } from '../features/auth/token'
 
 export const Route = createFileRoute('/_authed')({
@@ -14,11 +14,21 @@ export const Route = createFileRoute('/_authed')({
 })
 
 function AuthedLayout() {
-  const { user } = Route.useRouteContext()
+  const { user, queryClient } = Route.useRouteContext()
+  const navigate = useNavigate()
+  // El logout es solo del lado del cliente: la API no tiene sesión que cerrar.
+  const logout = () => {
+    clearToken()
+    queryClient.clear()
+    void navigate({ to: '/login' })
+  }
   return (
     <>
       <div className="actions">
         <span className="meta">{user.name ?? user.sub}</span>
+        <button type="button" className="secondary" onClick={logout}>
+          Cerrar sesión
+        </button>
       </div>
       <Outlet />
     </>
